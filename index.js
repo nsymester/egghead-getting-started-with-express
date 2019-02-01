@@ -3,6 +3,8 @@ const app = express();
 
 const fs = require("fs");
 const _ = require("lodash");
+const engines = require("consolidate");
+
 let users = [];
 
 fs.readFile("users.json", { encoding: "utf8" }, function(err, data) {
@@ -14,15 +16,16 @@ fs.readFile("users.json", { encoding: "utf8" }, function(err, data) {
   });
 });
 
+app.engine("hbs", engines.handlebars);
+
+app.set("views", "./views");
+app.set("view engine", "hbs");
+
 // req = request
 // res = result
+// not to be used in a real application
 app.get("/", function(req, res) {
-  let buffer = "";
-
-  users.forEach(function(user) {
-    buffer += `<a href="/${user.name.full}">${user.name.full}</a> <br/>`;
-  });
-  res.send(buffer);
+  res.render("index", { users: users });
 });
 
 // define a route matching a regular expression

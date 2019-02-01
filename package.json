@@ -12,9 +12,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.4"
+    "consolidate": "^0.15.1",
+    "express": "^4.16.4",
+    "handlebars": "^4.0.12"
   },
   "devDependencies": {
+    "jade": "^1.11.0",
     "lodash": "^4.17.11",
     "nodemon": "^1.18.9"
   }
