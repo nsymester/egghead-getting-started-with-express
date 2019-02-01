@@ -20,7 +20,7 @@ app.get("/", function(req, res) {
   let buffer = "";
 
   users.forEach(function(user) {
-    buffer += `<a href="/${user.name.full}">${user.name.full}</a> <br/>`;
+    buffer += `<a href="/${user.username}">${user.name.full}</a> <br/>`;
   });
   res.send(buffer);
 });
