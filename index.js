@@ -21,6 +21,8 @@ app.engine("hbs", engines.handlebars);
 app.set("views", "./views");
 app.set("view engine", "hbs");
 
+// serve static directory without any prefix
+app.use("/profilepics/", express.static("images"));
 // req = request
 // res = result
 // not to be used in a real application
@@ -43,7 +45,7 @@ app.get(/.*dog.*/, function(req, res, next) {
 // :usernmae - the colon tells express that its a path variable
 app.get("/:username", function(req, res) {
   let username = req.params.username;
-  res.send(username);
+  res.render("user", { username: username });
 });
 
 const server = app.listen(3000, function() {
