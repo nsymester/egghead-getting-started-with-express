@@ -19,7 +19,9 @@
   },
   "devDependencies": {
     "jade": "^1.11.0",
-    "lodash": "^4.17.11",
-    "nodemon": "^1.18.9"
+    "lodash": "^4.17.11"
+  },
+  "nodemonConfig": {
+    "verbose": true
   }
 }

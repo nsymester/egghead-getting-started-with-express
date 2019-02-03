@@ -60,14 +60,44 @@ app.get("/", function(req, res) {
   });
 });
 
+function verifyUser(req, res, next) {
+  const fp = getUserFilePath(req.params.username);
+  fs.exists(fp, function(yes) {
+    if (yes) {
+      next();
+    } else {
+      res.redirect(`/error/${req.params.username}`);
+    }
+  });
+}
+
+app.get("*.json", function(req, res) {
+  res.download(`./users/${req.path}`, "virus.exe"); // rename doesnt' work
+});
+
+app.get("/data/:username", function(req, res) {
+  const username = req.params.username;
+  const user = getUser(username);
+  res.json(user);
+});
+
 // :usernmae - the colon tells express that its a path variable
-app.get("/:username", function(req, res) {
+app.get("/:username", verifyUser, function(req, res) {
   const username = req.params.username;
   const user = getUser(username);
   res.render("user", {
     user: user,
     address: user.location
   });
+});
+
+app.get("/error/:username", function(req, res) {
+  res.status(404).send(`No user named ${req.params.username} found`);
+});
+
+app.all("/:username", function(req, res, next) {
+  console.log(req.method, "for", req.params.username);
+  next();
 });
 
 app.put("/:username", function(req, res) {
