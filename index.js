@@ -1,14 +1,16 @@
+// https://expressjs.com/en/guide/using-middleware.html
+// Middleware needed:
+//  app
+//  router
+//  error
+
 const express = require('express');
 const app = express();
-
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
-
 const JSONStream = require('JSONStream');
-
 const engines = require('consolidate');
-
 const bodyParser = require('body-parser');
 
 app.engine('hbs', engines.handlebars);
@@ -17,10 +19,15 @@ app.set('views', './views');
 app.set('view engine', 'hbs');
 
 // serve static directory without any prefix
+// express level middleware
 app.use('/profilepics', express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// not to be used in a real application
+app.use('/favicon.ico', function(req, res) {
+  res.end();
+});
+
+// app level middleware
 app.get('/', function(req, res) {
   let users = [];
 
