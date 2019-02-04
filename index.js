@@ -1,58 +1,41 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 
-const path = require("path");
-const fs = require("fs");
-const _ = require("lodash");
-const engines = require("consolidate");
+const path = require('path');
+const fs = require('fs');
+const _ = require('lodash');
+const helpers = require('./helpers');
 
-const bodyParser = require("body-parser");
+const engines = require('consolidate');
 
-function getUserFilePath(username) {
-  return path.join(__dirname, "users", username) + ".json";
-}
+const bodyParser = require('body-parser');
 
-function getUser(username) {
-  var user = JSON.parse(
-    fs.readFileSync(getUserFilePath(username), { encoding: "utf8" })
-  );
-  user.name.full = _.startCase(user.name.first + " " + user.name.last);
-  _.keys(user.location).forEach(function(key) {
-    user.location[key] = _.startCase(user.location[key]);
-  });
-  return user;
-}
+app.engine('hbs', engines.handlebars);
 
-function saveUser(username, data) {
-  var fp = getUserFilePath(username);
-  fs.unlinkSync(fp); // delete the file
-  fs.writeFileSync(fp, JSON.stringify(data, null, 2), { encoding: "utf8" });
-}
-
-app.engine("hbs", engines.handlebars);
-
-app.set("views", "./views");
-app.set("view engine", "hbs");
+app.set('views', './views');
+app.set('view engine', 'hbs');
 
 // serve static directory without any prefix
-app.use("/profilepics", express.static("images"));
+app.use('/profilepics', express.static('images'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // not to be used in a real application
-app.get("/", function(req, res) {
+app.get('/', function(req, res) {
   let users = [];
 
-  fs.readdir("users", function(err, files) {
+  fs.readdir('users', function(err, files) {
+    if (err) throw err;
     files.forEach(function(file) {
       fs.readFile(
-        path.join(__dirname, "users", file),
-        { encoding: "utf8" },
+        path.join(__dirname, 'users', file),
+        { encoding: 'utf8' },
         function(err, data) {
+          if (err) throw err;
           let user = JSON.parse(data);
           user.name.full = _.startCase(`${user.name.first} ${user.name.last}`);
           users.push(user);
           if (users.length === files.length) {
-            res.render("index", { users: users });
+            res.render('index', { users: users });
           }
         }
       );
@@ -60,59 +43,22 @@ app.get("/", function(req, res) {
   });
 });
 
-function verifyUser(req, res, next) {
-  const fp = getUserFilePath(req.params.username);
-  fs.exists(fp, function(yes) {
-    if (yes) {
-      next();
-    } else {
-      res.redirect(`/error/${req.params.username}`);
-    }
-  });
-}
-
-app.get("*.json", function(req, res) {
-  res.download(`./users/${req.path}`, "virus.exe"); // rename doesnt' work
+app.get('*.json', function(req, res) {
+  res.download(`./users/${req.path}`, 'virus.exe'); // rename doesnt' work
 });
 
-app.get("/data/:username", function(req, res) {
+app.get('/data/:username', function(req, res) {
   const username = req.params.username;
-  const user = getUser(username);
+  const user = helpers.getUser(username);
   res.json(user);
 });
 
-// :usernmae - the colon tells express that its a path variable
-app.get("/:username", verifyUser, function(req, res) {
-  const username = req.params.username;
-  const user = getUser(username);
-  res.render("user", {
-    user: user,
-    address: user.location
-  });
-});
-
-app.get("/error/:username", function(req, res) {
+app.get('/error/:username', function(req, res) {
   res.status(404).send(`No user named ${req.params.username} found`);
 });
 
-app.all("/:username", function(req, res, next) {
-  console.log(req.method, "for", req.params.username);
-  next();
-});
-
-app.put("/:username", function(req, res) {
-  const username = req.params.username;
-  const user = getUser(username);
-  user.location = req.body;
-  saveUser(username, user);
-  res.end();
-});
-
-app.delete("/:username", function(req, res) {
-  let fp = getUserFilePath(req.params.username);
-  fs.unlinkSync(fp);
-  res.sendStatus(200);
-});
+const userRouter = require('./username');
+app.use('/:username', userRouter);
 
 const server = app.listen(3000, function() {
   console.log(`Server at http://localhost:${server.address().port}`);
