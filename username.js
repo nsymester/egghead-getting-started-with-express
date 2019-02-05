@@ -1,5 +1,5 @@
 // https://expressjs.com/en/guide/using-middleware.html
-// Middleware needed:
+// Middleware needed for any app:
 //  app
 //  router
 //  error
@@ -7,6 +7,8 @@
 const express = require('express');
 const helpers = require('./helpers');
 const fs = require('fs');
+
+const User = require('./db').User;
 
 const router = express.Router({
   mergeParams: true,
@@ -25,10 +27,11 @@ router.use(function(req, res, next) {
 
 router.get('/', function(req, res) {
   const username = req.params.username;
-  const user = helpers.getUser(username);
-  res.render('user', {
-    user: user,
-    address: user.location,
+  User.findOne({ username: username }, function(err, user) {
+    res.render('user', {
+      user: user,
+      address: user.location,
+    });
   });
 });
 
@@ -43,10 +46,14 @@ router.use(function(err, req, res, next) {
 
 router.put('/', function(req, res) {
   const username = req.params.username;
-  const user = helpers.getUser(username);
-  user.location = req.body;
-  helpers.saveUser(username, user);
-  res.end();
+
+  User.findOneAndUpdate(
+    { username: username },
+    { location: req.body },
+    function(err, user) {
+      res.end();
+    }
+  );
 });
 
 router.delete('/', function(req, res) {

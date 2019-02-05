@@ -1,5 +1,5 @@
 // https://expressjs.com/en/guide/using-middleware.html
-// Middleware needed:
+// Middleware needed for any app:
 //  app
 //  router
 //  error
@@ -12,6 +12,8 @@ const _ = require('lodash');
 const JSONStream = require('JSONStream');
 const engines = require('consolidate');
 const bodyParser = require('body-parser');
+
+const User = require('./db').User;
 
 app.engine('hbs', engines.handlebars);
 
@@ -29,25 +31,8 @@ app.use('/favicon.ico', function(req, res) {
 
 // app level middleware
 app.get('/', function(req, res) {
-  let users = [];
-
-  fs.readdir('users', function(err, files) {
-    if (err) throw err;
-    files.forEach(function(file) {
-      fs.readFile(
-        path.join(__dirname, 'users', file),
-        { encoding: 'utf8' },
-        function(err, data) {
-          if (err) throw err;
-          let user = JSON.parse(data);
-          user.name.full = _.startCase(`${user.name.first} ${user.name.last}`);
-          users.push(user);
-          if (users.length === files.length) {
-            res.render('index', { users: users });
-          }
-        }
-      );
-    });
+  User.find({}, function(err, users) {
+    res.render('index', { users: users });
   });
 });
 

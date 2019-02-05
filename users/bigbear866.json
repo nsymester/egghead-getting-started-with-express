@@ -3,11 +3,12 @@
   "name": {
     "title": "mr",
     "first": "darryl",
-    "last": "hopkins"
+    "last": "hopkins",
+    "full": "Darryl Hopkins"
   },
   "location": {
     "street": "2125 taylor st",
-    "city": "el paso",
+    "city": "London",
     "state": "arkansas",
     "zip": "65375"
   },
