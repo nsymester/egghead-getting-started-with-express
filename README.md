@@ -2,9 +2,7 @@
 
 ## Pre-install
 
-Make sure MongoDB database is installed prior to using the mongodb npm package. You can download it 
-
-for a Mac OS X from [https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/) and then install it using the instructions from Download from: [https://www.mongodb.com/download-center/community?jmp=docs](https://www.mongodb.com/download-center/community?jmp=docs)
+Make sure MongoDB database is installed prior to using the mongodb npm package. You can download it for the Mac OS X from [https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/) and then install it using the instructions from Download from: [https://www.mongodb.com/download-center/community?jmp=docs](https://www.mongodb.com/download-center/community?jmp=docs)
 
 
 
