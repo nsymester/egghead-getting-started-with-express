@@ -47,13 +47,15 @@ router.use(function(err, req, res, next) {
 router.put('/', function(req, res) {
   const username = req.params.username;
 
-  User.findOneAndUpdate(
-    { username: username },
-    { location: req.body },
-    function(err, user) {
+  User.findOne({ username: username }, function(err, user) {
+    if (err) console.error(err);
+
+    user.name.full = req.body.name;
+    user.location = req.body.location;
+    user.save(function() {
       res.end();
-    }
-  );
+    });
+  });
 });
 
 router.delete('/', function(req, res) {

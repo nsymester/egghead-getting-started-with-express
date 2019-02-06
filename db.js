@@ -3,6 +3,7 @@ const uri = 'mongodb://localhost:27017/test';
 const mongoose = require('mongoose');
 mongoose.connect(uri);
 
+const _ = require('lodash');
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function(callback) {
@@ -16,7 +17,6 @@ const userSchema = mongoose.Schema({
     title: String,
     first: String,
     last: String,
-    full: String,
   },
   location: {
     street: String,
@@ -24,6 +24,18 @@ const userSchema = mongoose.Schema({
     state: String,
     zip: String,
   },
+});
+
+// getter
+userSchema.virtual('name.full').get(function() {
+  return _.startCase(`${this.name.first} ${this.name.last}`);
+});
+
+// setter
+userSchema.virtual('name.full').set(function(value) {
+  const bits = value.split(' ');
+  this.name.first = bits[0];
+  this.name.last = bits[1];
 });
 
 exports.User = mongoose.model('User', userSchema);

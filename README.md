@@ -1,53 +1,35 @@
-# MongoDB Integration
+# Use virtual properties with Mongoose and MongoDB
 
-## Pre-install
+Sometimes we need a property that doesn't exist, so we can create our own from the data we have.
 
-Make sure MongoDB database is installed prior to using the mongodb npm package. You can download it 
+The `full` property in`user_list.json`has been removed.
 
-for a Mac OS X from [https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/) and then install it using the instructions from Download from: [https://www.mongodb.com/download-center/community?jmp=docs](https://www.mongodb.com/download-center/community?jmp=docs)
-
-
-
-## Using NPM Package MongoDB
-
-Install the package by executing the following command:
+now replace the data in the database by executing the following command:
 
 ```bash
-npm i -S mongodb
+mongoimport --db test --collection users --drop --file user_list.json 
 ```
 
-This isn't MongoDB itself. It's just a library that'll let us access it from Node.
+Remove the `full` property from `db.js`
 
 
 
-Start MongoDB by executing the following command:
+Add the following _getter_ code to `db.js` to add the `full` property:
 
-```bash
-sudo mongod
+```javascript
+userSchema.virtual('name.full').get(function() {
+  return `${this.name.first} ${this.name.last}`;
+});
 ```
 
-Import data using MongoDB import tool
+Add the following _setter_ code to `db.js`to save the `name.first` and `name.last` properties:
 
-```bash
-mongoimport --db test --collection users --drop --file user_list.json
-```
-
-`--db test` : use the database named `test`.
-
-`--collection users`: use the collection named users (equivalent to a tables in a traditional database; a document is equivalent to a row).
-
-`--drop`: drop the collection if it needs to.
-
-`--file`: use the `user_list.json`file to get the data.
-
-
-
-## Using NPM Package Mongoose
-
-Install the package by executing the following command:
-
-```bash
-npm i -S mongoose
+```javascript
+userSchema.virtual('name.full').set(function(value) {
+  const bits = value.split(' ');
+  this.name.first = bits[0];
+  this.name.last = bits[1];
+});
 ```
 
 
